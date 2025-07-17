@@ -1,297 +1,77 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code Generator Futuristik</title>
-    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Ubuntu', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background: linear-gradient(45deg, #0d1b2a, #1b263b);
-            color: #e0e0e0;
-            overflow: auto;
-        }
-        .container {
-            text-align: center;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(0, 255, 255, 0.2);
-            max-width: 400px;
-            animation: glow 2s ease-in-out infinite alternate;
-        }
-        @keyframes glow {
-            0% { box-shadow: 0 0 10px rgba(0, 255, 255, 0.3), 0 0 20px rgba(0, 255, 255, 0.2); }
-            100% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.5), 0 0 30px rgba(0, 255, 255, 0.3); }
-        }
-        input {
-            padding: 12px;
-            width: 250px;
-            margin: 10px 0;
-            border: 1px solid #00d4ff;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            color: #e0e0e0;
-            font-size: 16px;
-            outline: none;
-        }
-        input::placeholder {
-            color: #a0a0a0;
-        }
-        select {
-            padding: 12px;
-            width: 250px;
-            margin: 10px 0;
-            border: 1px solid #00d4ff;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            color: #e0e0e0;
-            font-size: 16px;
-            outline: none;
-        }
-        button {
-            padding: 12px 24px;
-            background: #00d4ff;
-            border: none;
-            border-radius: 8px;
-            color: #0d1b2a;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 700;
-            text-transform: uppercase;
-            transition: all 0.3s;
-            margin: 5px;
-        }
-        button:hover {
-            background: #00ffcc;
-            box-shadow: 0 0 15px rgba(0, 255, 204, 0.5);
-        }
-        #qrcode {
-            position: relative;
-            margin: 20px auto;
-            padding: 12px;
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-            border: 4px solid;
-            border-image: linear-gradient(45deg, #00d4ff, #ff00ff, #ff6b6b) 1;
-            animation: borderGlow 3s ease-in-out infinite;
-        }
-        @keyframes borderGlow {
-            0% { border-image: linear-gradient(45deg, #00d4ff, #ff00ff, #ff6b6b) 1; }
-            50% { border-image: linear-gradient(45deg, #ff00ff, #ff6b6b, #00d4ff) 1; }
-            100% { border-image: linear-gradient(45deg, #00d4ff, #ff00ff, #ff6b6b) 1; }
-        }
-        .logo {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60px;
-            height: 60px;
-            background: url('https://via.placeholder.com/60') no-repeat center;
-            background-size: cover;
-            pointer-events: none;
-        }
-        #link-text {
-            font-family: 'Ubuntu', sans-serif;
-            font-weight: 700;
-            font-size: 18px;
-            background: linear-gradient(45deg, #00d4ff, #ff00ff, #ff6b6b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 10px rgba(0, 255, 204, 0.7);
-            margin-top: 15px;
-            word-break: break-word;
-            padding: 0 20px;
-        }
-        #error-message {
-            color: #ff6b6b;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QR Code Generator with Logo</title>
+  <script src="https://cdn.jsdelivr.net/npm/qr-code-styling/lib/qr-code-styling.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 2rem;
+    }
+    #qr-container {
+      margin-top: 20px;
+    }
+    input {
+      width: 80%;
+      padding: 10px;
+      font-size: 1rem;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>QR Code Futuristik</h1>
-        <input type="text" id="text" placeholder="Masukkan teks atau URL">
-        <select id="dotStyle">
-            <option value="square">Square</option>
-            <option value="dots">Dots</option>
-            <option value="rounded">Rounded</option>
-            <option value="extra-rounded" selected>Extra Rounded</option>
-            <option value="classy">Classy</option>
-            <option value="classy-rounded">Classy Rounded</option>
-        </select>
-        <button onclick="generateQRCode()">Generate QR Code</button>
-        <button onclick="downloadQRCode()" id="downloadBtn" style="display: none;">Download QR Code</button>
-        <div id="qrcode"></div>
-        <div id="link-text"></div>
-        <div id="error-message"></div>
-    </div>
+  <h1>QR Code Generator with Logo</h1>
+  <input type="text" id="qr-input" placeholder="Enter your text or URL here" />
+  <br />
+  <button onclick="generateQRCode()">Generate QR</button>
+  <button onclick="downloadQR()">Download Full HD</button>
 
-    <script src="https://unpkg.com/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
-    <script>
-        let qrCode = null;
+  <div id="qr-container"></div>
 
-        function generateQRCode() {
-            const text = document.getElementById("text").value;
-            const qrcodeContainer = document.getElementById("qrcode");
-            const linkText = document.getElementById("link-text");
-            const errorMessage = document.getElementById("error-message");
-            const dotStyle = document.getElementById("dotStyle").value;
-            qrcodeContainer.innerHTML = ''; // Kosongkan kontainer sebelumnya
-            linkText.innerHTML = ''; // Kosongkan teks sebelumnya
-            errorMessage.innerHTML = ''; // Kosongkan pesan error
+  <script>
+    let qrCode = null;
 
-            if (!text) {
-                errorMessage.textContent = 'Masukkan teks atau URL terlebih dahulu!';
-                return;
-            }
+    function generateQRCode() {
+      const qrData = document.getElementById("qr-input").value;
+      if (!qrData) return alert("Please enter a value!");
 
-            try {
-                qrCode = new QRCodeStyling({
-                    width: 250,
-                    height: 250,
-                    type: "canvas",
-                    data: text,
-                    image: "https://via.placeholder.com/60", // Ganti dengan URL logo Anda
-                    dotsOptions: {
-                        color: "#000000",
-                        type: dotStyle // Gunakan corak yang dipilih
-                    },
-                    backgroundOptions: {
-                        color: "#ffffff"
-                    },
-                    imageOptions: {
-                        crossOrigin: "anonymous",
-                        margin: 2
-                    }
-                });
+      // Hapus QR lama
+      document.getElementById("qr-container").innerHTML = "";
 
-                qrCode.append(qrcodeContainer);
-
-                // Tambahkan logo
-                const logo = document.createElement('div');
-                logo.className = 'logo';
-                qrcodeContainer.appendChild(logo);
-
-                // Tampilkan teks link di bawah
-                linkText.textContent = text;
-
-                // Tampilkan tombol download
-                document.getElementById("downloadBtn").style.display = 'inline-block';
-            } catch (error) {
-                console.error('Error generating QR code:', error);
-                errorMessage.textContent = 'Gagal membuat QR code. Cek konsol untuk detail.';
-            }
+      qrCode = new QRCodeStyling({
+        width: 1920,
+        height: 1920,
+        data: qrData,
+        image: "https://raw.githubusercontent.com/0x323/x/refs/heads/main/img/logo.svg", // ganti logo sesuai kebutuhan
+        dotsOptions: {
+          color: "#000",
+          type: "rounded"
+        },
+        backgroundOptions: {
+          color: "#ffffff"
+        },
+        imageOptions: {
+          crossOrigin: "anonymous",
+          margin: 20,
+          imageSize: 0.3
         }
+      });
 
-        function downloadQRCode() {
-            if (!qrCode || !qrCode._canvas) {
-                document.getElementById("error-message").textContent = 'Silakan generate QR code terlebih dahulu!';
-                return;
-            }
+      qrCode.append(document.getElementById("qr-container"));
+    }
 
-            const text = document.getElementById("text").value;
-            const qrCanvas = qrCode._canvas;
-            if (!qrCanvas || !text) {
-                document.getElementById("error-message").textContent = 'QR code atau teks tidak ditemukan!';
-                return;
-            }
-
-            // Buat canvas baru untuk download dalam HD (1000x1200)
-            const downloadCanvas = document.createElement('canvas');
-            const qrSize = 800; // Ukuran QR code dalam HD
-            const padding = 100; // Padding di sekitar QR code
-            const textHeight = 200; // Ruang untuk teks
-            downloadCanvas.width = 5000;
-            downloadCanvas.height = 5200;
-            const ctx = downloadCanvas.getContext('2d');
-
-            // Gambar latar belakang putih
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, downloadCanvas.width, downloadCanvas.height);
-
-            // Gambar border gradient biru-ungu-pink
-            const gradient = ctx.createLinearGradient(0, 0, downloadCanvas.width, downloadCanvas.height);
-            gradient.addColorStop(0, '#00d4ff');
-            gradient.addColorStop(0.5, '#ff00ff');
-            gradient.addColorStop(1, '#ff6b6b');
-            ctx.strokeStyle = gradient;
-            ctx.lineWidth = 20;
-            ctx.strokeRect(padding - 10, padding - 10, qrSize + 20, qrSize + 20);
-
-            // Gambar QR code
-            ctx.drawImage(qrCanvas, padding, padding, qrSize, qrSize);
-
-            // Gambar logo
-            const logoImg = new Image();
-            logoImg.src = 'https://raw.githubusercontent.com/0x323/x/refs/heads/main/img/logo.svg'; // Ganti dengan URL logo Anda
-            logoImg.crossOrigin = 'anonymous';
-            logoImg.onload = () => {
-                ctx.drawImage(logoImg, (downloadCanvas.width - 120) / 2, (qrSize - 120) / 2 + padding, 120, 120);
-
-                // Gambar teks dengan gradient
-                ctx.font = 'bold 40px Ubuntu';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'top';
-                ctx.fillStyle = gradient;
-                ctx.shadowColor = 'rgba(0, 255, 204, 0.7)';
-                ctx.shadowBlur = 15;
-
-                // Potong teks jika terlalu panjang
-                const maxWidth = qrSize;
-                let displayText = text;
-                if (ctx.measureText(text).width > maxWidth) {
-                    while (ctx.measureText(displayText + '...').width > maxWidth && displayText.length > 0) {
-                        displayText = displayText.slice(0, -1);
-                    }
-                    displayText += '...';
-                }
-                ctx.fillText(displayText, downloadCanvas.width / 2, qrSize + padding + 50);
-
-                // Finalize download
-                const link = document.createElement('a');
-                link.href = downloadCanvas.toDataURL('image/png');
-                link.download = 'qrcode-futuristik.png';
-                link.click();
-            };
-            logoImg.onerror = () => {
-                console.warn('Gagal memuat logo, melanjutkan tanpa logo.');
-                // Gambar teks dengan gradient meskipun logo gagal
-                ctx.font = 'bold 40px Ubuntu';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'top';
-                ctx.fillStyle = gradient;
-                ctx.shadowColor = 'rgba(0, 255, 204, 0.7)';
-                ctx.shadowBlur = 15;
-                const maxWidth = qrSize;
-                let displayText = text;
-                if (ctx.measureText(text).width > maxWidth) {
-                    while (ctx.measureText(displayText + '...').width > maxWidth && displayText.length > 0) {
-                        displayText = displayText.slice(0, -1);
-                    }
-                    displayText += '...';
-                }
-                ctx.fillText(displayText, downloadCanvas.width / 2, qrSize + padding + 50);
-
-                // Finalize download
-                const link = document.createElement('a');
-                link.href = downloadCanvas.toDataURL('image/png');
-                link.download = 'qrcode-futuristik.png';
-                link.click();
-            };
-        }
-    </script>
+    function downloadQR() {
+      if (!qrCode) return alert("Generate QR Code first!");
+      qrCode.download({ name: "qr-code-fullhd", extension: "png" });
+    }
+  </script>
 </body>
 </html>
