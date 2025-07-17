@@ -79,16 +79,6 @@
             50% { border-image: linear-gradient(45deg, #ff00ff, #ff6b6b, #00d4ff) 1; }
             100% { border-image: linear-gradient(45deg, #00d4ff, #ff00ff, #ff6b6b) 1; }
         }
-        .fingerprint-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('https://i.imgur.com/8qK8q2Z.png') center/cover no-repeat;
-            opacity: 0.3;
-            pointer-events: none;
-        }
         .logo {
             position: absolute;
             top: 50%;
@@ -104,7 +94,9 @@
             font-family: 'Ubuntu', sans-serif;
             font-weight: 700;
             font-size: 18px;
-            color: #00ffcc;
+            background: linear-gradient(45deg, #00d4ff, #ff00ff, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             text-shadow: 0 0 10px rgba(0, 255, 204, 0.7);
             margin-top: 15px;
             word-break: break-word;
@@ -152,7 +144,7 @@
                     height: 250,
                     type: "canvas",
                     data: text,
-                    image: "https://via.placeholder.com/60", // Ganti dengan URL logo Anda
+                    image: "https://raw.githubusercontent.com/0x323/x/refs/heads/main/img/logo.svg", // Ganti dengan URL logo Anda
                     dotsOptions: {
                         color: "#000000",
                         type: "extra-rounded"
@@ -168,11 +160,7 @@
 
                 qrCode.append(qrcodeContainer);
 
-                // Tambahkan efek sidik jari dan logo
-                const overlay = document.createElement('div');
-                overlay.className = 'fingerprint-overlay';
-                qrcodeContainer.appendChild(overlay);
-
+                // Tambahkan logo
                 const logo = document.createElement('div');
                 logo.className = 'logo';
                 qrcodeContainer.appendChild(logo);
@@ -211,7 +199,7 @@
             const ctx = downloadCanvas.getContext('2d');
 
             // Gambar latar belakang putih
-            ctx.fillStyle = '#ffffff';
+            ctx.fillStyle = '#000000';
             ctx.fillRect(0, 0, downloadCanvas.width, downloadCanvas.height);
 
             // Gambar border gradient biru-ungu-pink
@@ -223,85 +211,65 @@
             ctx.lineWidth = 20;
             ctx.strokeRect(padding - 10, padding - 10, qrSize + 20, qrSize + 20);
 
-            // Gambar efek sidik jari
-            const fingerprintImg = new Image();
-            fingerprintImg.src = 'https://i.imgur.com/8qK8q2Z.png'; // Ganti dengan gambar sidik jari
-            fingerprintImg.crossOrigin = 'Anonymous';
+            // Gambar QR code
+            ctx.drawImage(qrCanvas, padding, padding, qrSize, qrSize);
 
-            // Fungsi untuk menggambar elemen dan download
-            const drawElements = () => {
-                // Gambar sidik jari
-                ctx.globalAlpha = 0.3;
-                ctx.drawImage(fingerprintImg, padding, padding, qrSize, qrSize);
-                ctx.globalAlpha = 1.0;
+            // Gambar logo
+            const logoImg = new Image();
+            logoImg.src = 'https://via.placeholder.com/60'; // Ganti dengan URL logo Anda
+            logoImg.crossOrigin = 'Anonymous';
+            logoImg.onload = () => {
+                ctx.drawImage(logoImg, (downloadCanvas.width - 120) / 2, (qrSize - 120) / 2 + padding, 120, 120);
 
-                // Gambar QR code
-                ctx.drawImage(qrCanvas, padding, padding, qrSize, qrSize);
+                // Gambar teks dengan gradient
+                ctx.font = 'bold 40px Ubuntu';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.fillStyle = gradient;
+                ctx.shadowColor = 'rgba(0, 255, 204, 0.7)';
+                ctx.shadowBlur = 15;
 
-                // Gambar logo
-                const logoImg = new Image();
-                logoImg.src = 'https://via.placeholder.com/60'; // Ganti dengan URL logo Anda
-                logoImg.crossOrigin = 'Anonymous';
-                logoImg.onload = () => {
-                    ctx.drawImage(logoImg, (downloadCanvas.width - 120) / 2, (qrSize - 120) / 2 + padding, 120, 120);
-
-                    // Gambar teks
-                    ctx.font = 'bold 40px Ubuntu';
-                    ctx.fillStyle = '#00ffcc';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'top';
-                    ctx.shadowColor = 'rgba(0, 255, 204, 0.7)';
-                    ctx.shadowBlur = 15;
-
-                    // Potong teks jika terlalu panjang
-                    const maxWidth = qrSize;
-                    let displayText = text;
-                    if (ctx.measureText(text).width > maxWidth) {
-                        while (ctx.measureText(displayText + '...').width > maxWidth && displayText.length > 0) {
-                            displayText = displayText.slice(0, -1);
-                        }
-                        displayText += '...';
+                // Potong teks jika terlalu panjang
+                const maxWidth = qrSize;
+                let displayText = text;
+                if (ctx.measureText(text).width > maxWidth) {
+                    while (ctx.measureText(displayText + '...').width > maxWidth && displayText.length > 0) {
+                        displayText = displayText.slice(0, -1);
                     }
-                    ctx.fillStyle = gradient;
-                    ctx.fillText(displayText, downloadCanvas.width / 2, qrSize + padding + 50);
+                    displayText += '...';
+                }
+                ctx.fillText(displayText, downloadCanvas.width / 2, qrSize + padding + 50);
 
-                    // Finalize download
-                    const link = document.createElement('a');
-                    link.href = downloadCanvas.toDataURL('image/png');
-                    link.download = 'qrcode-futuristik.png';
-                    link.click();
-                };
-                logoImg.onerror = () => {
-                    console.warn('Gagal memuat logo, melanjutkan tanpa logo.');
-                    // Gambar teks meskipun logo gagal
-                    ctx.font = 'bold 40px Ubuntu';
-                    ctx.fillStyle = '#00ffcc';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'top';
-                    ctx.shadowColor = 'rgba(0, 255, 204, 0.7)';
-                    ctx.shadowBlur = 15;
-                    const maxWidth = qrSize;
-                    let displayText = text;
-                    if (ctx.measureText(text).width > maxWidth) {
-                        while (ctx.measureText(displayText + '...').width > maxWidth && displayText.length > 0) {
-                            displayText = displayText.slice(0, -1);
-                        }
-                        displayText += '...';
-                    }
-                    ctx.fillText(displayText, downloadCanvas.width / 2, qrSize + padding + 50);
-
-                    // Finalize download
-                    const link = document.createElement('a');
-                    link.href = downloadCanvas.toDataURL('image/png');
-                    link.download = 'qrcode-futuristik.png';
-                    link.click();
-                };
+                // Finalize download
+                const link = document.createElement('a');
+                link.href = downloadCanvas.toDataURL('image/png');
+                link.download = 'qrcode-futuristik.png';
+                link.click();
             };
+            logoImg.onerror = () => {
+                console.warn('Gagal memuat logo, melanjutkan tanpa logo.');
+                // Gambar teks dengan gradient meskipun logo gagal
+                ctx.font = 'bold 40px Ubuntu';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.fillStyle = gradient;
+                ctx.shadowColor = 'rgba(0, 255, 204, 0.7)';
+                ctx.shadowBlur = 15;
+                const maxWidth = qrSize;
+                let displayText = text;
+                if (ctx.measureText(text).width > maxWidth) {
+                    while (ctx.measureText(displayText + '...').width > maxWidth && displayText.length > 0) {
+                        displayText = displayText.slice(0, -1);
+                    }
+                    displayText += '...';
+                }
+                ctx.fillText(displayText, downloadCanvas.width / 2, qrSize + padding + 50);
 
-            fingerprintImg.onload = () => drawElements();
-            fingerprintImg.onerror = () => {
-                console.warn('Gagal memuat sidik jari, melanjutkan tanpa sidik jari.');
-                drawElements();
+                // Finalize download
+                const link = document.createElement('a');
+                link.href = downloadCanvas.toDataURL('image/png');
+                link.download = 'qrcode-futuristik.png';
+                link.click();
             };
         }
     </script>
