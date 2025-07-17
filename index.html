@@ -139,8 +139,8 @@
             // Buat QR Code
             qrCodeCanvas = new QRCode(qrcodeContainer, {
                 text: text,
-                width: 5000,
-                height: 5000,
+                width: 200,
+                height: 200,
                 colorDark: '#000000',
                 colorLight: '#ffffff',
                 correctLevel: QRCode.CorrectLevel.H
@@ -173,7 +173,7 @@
 
             // Buat canvas baru untuk download
             const downloadCanvas = document.createElement('canvas');
-            const qrSize = 5000; // Ukuran QR code
+            const qrSize = 200; // Ukuran QR code
             const padding = 10; // Padding di sekitar QR code
             const textHeight = 40; // Ruang untuk teks
             downloadCanvas.width = qrSize + padding * 2;
