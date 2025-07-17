@@ -46,6 +46,17 @@
         input::placeholder {
             color: #a0a0a0;
         }
+        select {
+            padding: 12px;
+            width: 250px;
+            margin: 10px 0;
+            border: 1px solid #00d4ff;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
+            font-size: 16px;
+            outline: none;
+        }
         button {
             padding: 12px 24px;
             background: #00d4ff;
@@ -113,6 +124,14 @@
     <div class="container">
         <h1>QR Code Futuristik</h1>
         <input type="text" id="text" placeholder="Masukkan teks atau URL">
+        <select id="dotStyle">
+            <option value="square">Square</option>
+            <option value="dots">Dots</option>
+            <option value="rounded">Rounded</option>
+            <option value="extra-rounded" selected>Extra Rounded</option>
+            <option value="classy">Classy</option>
+            <option value="classy-rounded">Classy Rounded</option>
+        </select>
         <button onclick="generateQRCode()">Generate QR Code</button>
         <button onclick="downloadQRCode()" id="downloadBtn" style="display: none;">Download QR Code</button>
         <div id="qrcode"></div>
@@ -129,6 +148,7 @@
             const qrcodeContainer = document.getElementById("qrcode");
             const linkText = document.getElementById("link-text");
             const errorMessage = document.getElementById("error-message");
+            const dotStyle = document.getElementById("dotStyle").value;
             qrcodeContainer.innerHTML = ''; // Kosongkan kontainer sebelumnya
             linkText.innerHTML = ''; // Kosongkan teks sebelumnya
             errorMessage.innerHTML = ''; // Kosongkan pesan error
@@ -144,10 +164,10 @@
                     height: 250,
                     type: "canvas",
                     data: text,
-                    image: "https://raw.githubusercontent.com/0x323/x/refs/heads/main/img/logo.svg", // Ganti dengan URL logo Anda
+                    image: "https://via.placeholder.com/60", // Ganti dengan URL logo Anda
                     dotsOptions: {
                         color: "#000000",
-                        type: "extra-rounded"
+                        type: dotStyle // Gunakan corak yang dipilih
                     },
                     backgroundOptions: {
                         color: "#ffffff"
@@ -199,7 +219,7 @@
             const ctx = downloadCanvas.getContext('2d');
 
             // Gambar latar belakang putih
-            ctx.fillStyle = '#000000';
+            ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, downloadCanvas.width, downloadCanvas.height);
 
             // Gambar border gradient biru-ungu-pink
@@ -217,7 +237,7 @@
             // Gambar logo
             const logoImg = new Image();
             logoImg.src = 'https://raw.githubusercontent.com/0x323/x/refs/heads/main/img/logo.svg'; // Ganti dengan URL logo Anda
-            logoImg.crossOrigin = 'Anonymous';
+            logoImg.crossOrigin = 'anonymous';
             logoImg.onload = () => {
                 ctx.drawImage(logoImg, (downloadCanvas.width - 120) / 2, (qrSize - 120) / 2 + padding, 120, 120);
 
