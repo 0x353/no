@@ -74,7 +74,7 @@
             border-image: linear-gradient(45deg, #00d4ff, #ff00ff, #ff6b6b) 1;
             animation: borderGlow 3s ease-in-out infinite;
         }
-        @keyframesDuplicate borderGlow {
+        @keyframes borderGlow {
             0% { border-image: linear-gradient(45deg, #00d4ff, #ff00ff, #ff6b6b) 1; }
             50% { border-image: linear-gradient(45deg, #ff00ff, #ff6b6b, #00d4ff) 1; }
             100% { border-image: linear-gradient(45deg, #00d4ff, #ff00ff, #ff6b6b) 1; }
@@ -85,7 +85,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('https://i.imgur.com/8qK8q2Z.png') center/cover no-repeat; /* Ganti dengan gambar sidik jari */
+            background: url('https://i.imgur.com/8qK8q2Z.png') center/cover no-repeat;
             opacity: 0.3;
             pointer-events: none;
         }
@@ -110,6 +110,11 @@
             word-break: break-word;
             padding: 0 20px;
         }
+        #error-message {
+            color: #ff6b6b;
+            font-size: 14px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -120,72 +125,79 @@
         <button onclick="downloadQRCode()" id="downloadBtn" style="display: none;">Download QR Code</button>
         <div id="qrcode"></div>
         <div id="link-text"></div>
+        <div id="error-message"></div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+    <script src="https://unpkg.com/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
     <script>
-        const qrCode = new QRCodeStyling({
-            width: 250,
-            height: 250,
-            type: "canvas",
-            data: "",
-            image: "https://via.placeholder.com/60", // Ganti dengan logo Anda
-            dotsOptions: {
-                color: "#000000",
-                type: "extra-rounded"
-            },
-            backgroundOptions: {
-                color: "#ffffff"
-            },
-            imageOptions: {
-                crossOrigin: "anonymous",
-                margin: 2
-            }
-        });
-
-        qrCode.append(document.getElementById("qrcode"));
+        let qrCode = null;
 
         function generateQRCode() {
             const text = document.getElementById("text").value;
             const qrcodeContainer = document.getElementById("qrcode");
             const linkText = document.getElementById("link-text");
+            const errorMessage = document.getElementById("error-message");
             qrcodeContainer.innerHTML = ''; // Kosongkan kontainer sebelumnya
             linkText.innerHTML = ''; // Kosongkan teks sebelumnya
+            errorMessage.innerHTML = ''; // Kosongkan pesan error
 
             if (!text) {
-                alert("Masukkan teks atau URL terlebih dahulu!");
+                errorMessage.textContent = 'Masukkan teks atau URL terlebih dahulu!';
                 return;
             }
 
-            qrCode.update({ data: text });
-            qrcodeContainer.appendChild(qrCode._canvas);
+            try {
+                qrCode = new QRCodeStyling({
+                    width: 250,
+                    height: 250,
+                    type: "canvas",
+                    data: text,
+                    image: "https://via.placeholder.com/60", // Ganti dengan URL logo Anda
+                    dotsOptions: {
+                        color: "#000000",
+                        type: "extra-rounded"
+                    },
+                    backgroundOptions: {
+                        color: "#ffffff"
+                    },
+                    imageOptions: {
+                        crossOrigin: "anonymous",
+                        margin: 2
+                    }
+                });
 
-            // Tambahkan efek sidik jari dan logo
-            const overlay = document.createElement('div');
-            overlay.className = 'fingerprint-overlay';
-            qrcodeContainer.appendChild(overlay);
+                qrCode.append(qrcodeContainer);
 
-            const logo = document.createElement('div');
-            logo.className = 'logo';
-            qrcodeContainer.appendChild(logo);
+                // Tambahkan efek sidik jari dan logo
+                const overlay = document.createElement('div');
+                overlay.className = 'fingerprint-overlay';
+                qrcodeContainer.appendChild(overlay);
 
-            // Tampilkan teks link di bawah
-            linkText.textContent = text;
+                const logo = document.createElement('div');
+                logo.className = 'logo';
+                qrcodeContainer.appendChild(logo);
 
-            // Tampilkan tombol download
-            document.getElementById("downloadBtn").style.display = 'inline-block';
+                // Tampilkan teks link di bawah
+                linkText.textContent = text;
+
+                // Tampilkan tombol download
+                document.getElementById("downloadBtn").style.display = 'inline-block';
+            } catch (error) {
+                console.error('Error generating QR code:', error);
+                errorMessage.textContent = 'Gagal membuat QR code. Cek konsol untuk detail.';
+            }
         }
 
         function downloadQRCode() {
-            if (!qrCode._canvas) {
-                alert("Silakan generate QR code terlebih dahulu!");
+            if (!qrCode || !qrCode._canvas) {
+                document.getElementById("error-message").textContent = 'Silakan generate QR code terlebih dahulu!';
                 return;
             }
 
             const text = document.getElementById("text").value;
             const qrCanvas = qrCode._canvas;
             if (!qrCanvas || !text) {
-                alert("QR code atau teks tidak ditemukan!");
+                document.getElementById("error-message").textContent = 'QR code atau teks tidak ditemukan!';
                 return;
             }
 
@@ -216,19 +228,19 @@
             fingerprintImg.src = 'https://i.imgur.com/8qK8q2Z.png'; // Ganti dengan gambar sidik jari
             fingerprintImg.crossOrigin = 'Anonymous';
 
-            // Gambar QR code dan elemen lainnya
+            // Fungsi untuk menggambar elemen dan download
             const drawElements = () => {
                 // Gambar sidik jari
                 ctx.globalAlpha = 0.3;
                 ctx.drawImage(fingerprintImg, padding, padding, qrSize, qrSize);
                 ctx.globalAlpha = 1.0;
 
-                // Gambar QR code (skala ke ukuran HD)
+                // Gambar QR code
                 ctx.drawImage(qrCanvas, padding, padding, qrSize, qrSize);
 
                 // Gambar logo
                 const logoImg = new Image();
-                logoImg.src = 'https://raw.githubusercontent.com/0x323/x/refs/heads/main/img/logo.svg'; // Ganti dengan URL logo Anda
+                logoImg.src = 'https://via.placeholder.com/60'; // Ganti dengan URL logo Anda
                 logoImg.crossOrigin = 'Anonymous';
                 logoImg.onload = () => {
                     ctx.drawImage(logoImg, (downloadCanvas.width - 120) / 2, (qrSize - 120) / 2 + padding, 120, 120);
@@ -261,6 +273,7 @@
                 };
                 logoImg.onerror = () => {
                     console.warn('Gagal memuat logo, melanjutkan tanpa logo.');
+                    // Gambar teks meskipun logo gagal
                     ctx.font = 'bold 40px Ubuntu';
                     ctx.fillStyle = '#00ffcc';
                     ctx.textAlign = 'center';
@@ -276,6 +289,8 @@
                         displayText += '...';
                     }
                     ctx.fillText(displayText, downloadCanvas.width / 2, qrSize + padding + 50);
+
+                    // Finalize download
                     const link = document.createElement('a');
                     link.href = downloadCanvas.toDataURL('image/png');
                     link.download = 'qrcode-futuristik.png';
